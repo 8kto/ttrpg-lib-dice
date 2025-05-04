@@ -2,6 +2,14 @@
   "name": "ttrpg-lib-dice",
   "version": "1.0.0",
   "description": "A small library for rolling dice in tabletop games",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/8kto/ttrpg-lib-dice.git"
+  },
+  "bugs": {
+    "url": "https://github.com/8kto/ttrpg-lib-dice/issues"
+  },
+  "homepage": "https://github.com/8kto/ttrpg-lib-dice#readme",
   "keywords": [
     "typescript",
     "npm",
