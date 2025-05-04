@@ -7,20 +7,23 @@ on:
 
 jobs:
   test:
+    # Runs tests inside a minimal Node.js container for faster startup
     runs-on: ubuntu-latest
+    container: node:16-alpine
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '16'
       - run: npm ci
       - run: npm test
 
   publish:
     needs: test
+    # Publish only if tests succeed (implicit when using needs)
     runs-on: ubuntu-latest
-    if: success()
+    container: node:16-alpine
 
     steps:
       - uses: actions/checkout@v3
@@ -33,7 +36,7 @@ jobs:
           always-auth: true
       - run: npm ci
       - run:
-        npm version patch -m "chore(release): %s"
+        npm version patch -m 'chore(release): %s'
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
