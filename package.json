@@ -25,6 +25,7 @@
     "prebuild": "rm -rf dist/",
     "build": "tsc",
     "prepare": "yarn build",
+    "release": "yarn version --patch && git push origin main && git push origin --tags && yarn publish --access public",
     "format": "prettier . --check",
     "format:fix": "yarn eslint --fix && prettier --write .",
     "lint": "yarn eslint src/",
