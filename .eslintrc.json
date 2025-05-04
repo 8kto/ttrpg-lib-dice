@@ -1,6 +1,6 @@
 {
   "extends": ["eslint:recommended", "plugin:import/recommended", "plugin:@typescript-eslint/recommended", "prettier"],
-  "plugins": ["import", "simple-import-sort", "sort-keys-fix", "sort-destructure-keys", "@typescript-eslint"],
+  "plugins": ["import", "simple-import-sort", "sort-destructure-keys", "@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2022,
@@ -20,15 +20,12 @@
     "import/order": "off",
     "prefer-template": "error",
     "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }],
-    "sort-keys": "off",
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
     "no-console": ["error", { "allow": ["error", "info"] }],
     "no-debugger": "error",
     "no-undefined": "error",
     "no-undef": "off",
-    "sort-keys-fix/sort-keys-fix": ["error", "asc", { "natural": true }],
-    "sort-destructure-keys/sort-destructure-keys": ["error", { "caseSensitive": false }],
     "no-implicit-coercion": [
       "error",
       {
@@ -42,7 +39,7 @@
   },
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx"],
+      "files": ["*.ts"],
       "rules": {
         "no-undef": "off",
         "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
@@ -71,28 +68,9 @@
       }
     },
     {
-      "files": ["src/js/domain/**/*.ts", "src/js/config/**/*.ts"],
-      "rules": {
-        "sort-keys-fix/sort-keys-fix": "off"
-      }
-    },
-    {
-      "files": ["./*.ts", "./*.js"],
-      "rules": {
-        "sort-keys-fix/sort-keys-fix": "off",
-        "@typescript-eslint/no-var-requires": "off"
-      }
-    },
-    {
       "files": ["src/**/*.test.ts"],
       "rules": {
         "@typescript-eslint/ban-ts-comment": "off"
-      }
-    },
-    {
-      "files": ["tests_visual_regression/**/*.js"],
-      "rules": {
-        "@typescript-eslint/no-var-requires": "off"
       }
     }
   ],
@@ -104,7 +82,7 @@
       },
       "node": {
         "paths": ["src"],
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [".ts"]
       }
     }
   }
