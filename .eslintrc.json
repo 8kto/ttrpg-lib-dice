@@ -1,0 +1,111 @@
+{
+  "extends": ["eslint:recommended", "plugin:import/recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  "plugins": ["import", "simple-import-sort", "sort-keys-fix", "sort-destructure-keys", "@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "browser": true,
+    "node": false,
+    "jest": true,
+    "es6": true
+  },
+  "rules": {
+    "semi": ["error", "never"],
+    "comma-dangle": ["error", "always-multiline"],
+    "curly": ["error", "all"],
+    "import/order": "off",
+    "prefer-template": "error",
+    "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }],
+    "sort-keys": "off",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "no-console": ["error", { "allow": ["error", "info"] }],
+    "no-debugger": "error",
+    "no-undefined": "error",
+    "no-undef": "off",
+    "sort-keys-fix/sort-keys-fix": ["error", "asc", { "natural": true }],
+    "sort-destructure-keys/sort-destructure-keys": ["error", { "caseSensitive": false }],
+    "no-implicit-coercion": [
+      "error",
+      {
+        "boolean": true,
+        "string": true,
+        "number": true,
+        "disallowTemplateShorthand": true,
+        "allow": ["!!"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "no-undef": "off",
+        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/explicit-function-return-type": "error",
+        "@typescript-eslint/explicit-module-boundary-types": "error",
+        "@typescript-eslint/typedef": [
+          "error",
+          {
+            "arrayDestructuring": false,
+            "arrowParameter": false,
+            "memberVariableDeclaration": true,
+            "objectDestructuring": false,
+            "parameter": true,
+            "propertyDeclaration": true,
+            "variableDeclaration": false,
+            "variableDeclarationIgnoreFunction": true
+          }
+        ],
+        "@typescript-eslint/consistent-type-imports": [
+          "error",
+          {
+            "prefer": "type-imports",
+            "disallowTypeAnnotations": false
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/js/domain/**/*.ts", "src/js/config/**/*.ts"],
+      "rules": {
+        "sort-keys-fix/sort-keys-fix": "off"
+      }
+    },
+    {
+      "files": ["./*.ts", "./*.js"],
+      "rules": {
+        "sort-keys-fix/sort-keys-fix": "off",
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    },
+    {
+      "files": ["src/**/*.test.ts"],
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
+    },
+    {
+      "files": ["tests_visual_regression/**/*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./tsconfig.json"
+      },
+      "node": {
+        "paths": ["src"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  }
+}

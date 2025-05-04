@@ -15,3 +15,4 @@ tests_visual_regression/html_report/
 tests_visual_regression/ci_report/
 tests_visual_regression/json_report/
 
+dist/
