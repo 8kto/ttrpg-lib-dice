@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-publish:
-    # Run in lightweight Node 20 Alpine container
+    # Use Node 20 on Alpine for speed
     runs-on: ubuntu-latest
     container: node:20-alpine
 
@@ -15,7 +15,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: true  # needed for yarn publish auth
+          persist-credentials: true
+          fetch-depth: 0  # fetch all history so we can push tags
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -32,6 +33,11 @@ jobs:
 
       - name: Bump patch version
         run: yarn version --patch
+
+      - name: Push version bump & tags
+        run: |
+          git push origin HEAD:main
+          git push origin --tags
 
       - name: Publish to npm
         run: yarn publish --access public
