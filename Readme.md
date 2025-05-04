@@ -13,7 +13,14 @@ yarn add dice-roller
 ## Usage
 
 ```ts
-import { Dice, roll, rollDiceFormula, secureRandomInteger, getRandomArrayItem, getRandomArrayItems } from 'dice-roller'
+import {
+  Dice,
+  roll,
+  rollDiceFormula,
+  secureRandomInteger,
+  getRandomArrayItem,
+  getRandomArrayItems
+} from 'dice-roller'
 
 // Roll a single D20
 const single = roll(Dice.d20)
