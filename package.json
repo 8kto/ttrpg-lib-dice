@@ -4,11 +4,26 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "deploy": "scripts/deploy.sh",
+    "format": "prettier . --check",
+    "format:fix": "yarn eslint --fix && prettier --write .",
+    "lint": "yarn eslint src/",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {},
   "devDependencies": {
-    "typescript": "^5.5.3"
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
+    "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "typescript": "^5.5.3",
+    "prettier": "^3.3.2",
+    "ts-jest": "^29.1.5"
   },
   "private": true
 }
