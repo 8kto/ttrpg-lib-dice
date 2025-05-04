@@ -1,26 +1,39 @@
 {
   "name": "ttrpg-lib-dice",
   "version": "1.0.0",
-  "description": "",
+  "description": "A small library for rolling dice in tabletop games",
+  "keywords": [
+    "typescript",
+    "npm",
+    "library",
+    "random",
+    "diceroller",
+    "dices",
+    "rpg",
+    "ttrpg"
+  ],
   "main": "dist/index.js",
   "scripts": {
+    "prebuild": "rm -rf dist/",
     "build": "tsc",
+    "prepare": "yarn build",
     "format": "prettier . --check",
     "format:fix": "yarn eslint --fix && prettier --write .",
     "lint": "yarn eslint src/",
-    "test": "jest",
-    "test:coverage": "jest --collectCoverage"
+    "test": "jest src/",
+    "test:coverage": "jest src/ --collectCoverage"
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-simple-import-sort": "^12.1.0",
-    "typescript": "^5.5.3",
+    "jest": "^29.7.0",
     "prettier": "^3.3.2",
-    "ts-jest": "^29.1.5"
-  },
-  "private": true
+    "ts-jest": "^29.3.2",
+    "typescript": "^5.5.3"
+  }
 }
