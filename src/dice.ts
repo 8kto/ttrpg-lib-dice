@@ -128,6 +128,9 @@ export const rollDiceFormula = (formula: string): number => {
 type DiceRollResult = [string, number, number[]]
 type DiceRollResultsList = DiceRollResult[]
 
+/**
+ * TODO fix issues, publish
+ */
 export const rollDiceFormulaDetailed = (formula: string): DiceRollResultsList => {
   if (!isValidDiceFormula(formula)) {
     // throw new Error('Invalid dice formula, allowed characters are +-, numbers and dices (d6 etc.)')
