@@ -1,0 +1,17 @@
+.idea
+node_modules
+.env.development.local
+.cache/
+build/
+src/styles/*.processed.css
+coverage/
+src/**/*.gitignored
+
+# Ignore test screenshots
+tests_visual_regression/bitmaps_test/
+
+# Ignore reports
+tests_visual_regression/html_report/
+tests_visual_regression/ci_report/
+tests_visual_regression/json_report/
+
