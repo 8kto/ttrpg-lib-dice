@@ -1,0 +1,14 @@
+coverage/
+src/
+*.ts
+!*.d.ts
+
+**/*/__tests__/
+*.test.js
+*.test.ts
+
+.idea/
+jest.config.js
+tsconfig.json
+.*
+

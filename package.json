@@ -22,9 +22,6 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "prebuild": "rm -rf dist/",
     "build": "tsc",
