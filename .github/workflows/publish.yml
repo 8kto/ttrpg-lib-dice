@@ -1,45 +1,29 @@
-name: CI & Publish
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   build-and-publish:
-    # Use Node 20 on Alpine for speed
     runs-on: ubuntu-latest
-    container: node:20-alpine
+    # no container: … block here
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           persist-credentials: true
-          fetch-depth: 0  # fetch all history so we can push tags
+          fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '20'
           registry-url: https://registry.npmjs.org/
           always-auth: true
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run tests
-        run: yarn test
-
-      - name: Bump patch version
-        run: yarn version --patch
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
+      - run: yarn version --patch
 
       - name: Push version bump & tags
         run: |
           git push origin HEAD:main
           git push origin --tags
 
-      - name: Publish to npm
-        run: yarn publish --access public
+      - run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
