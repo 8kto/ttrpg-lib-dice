@@ -6,37 +6,34 @@ on:
       - main
 
 jobs:
-  test:
-    # Runs tests inside a minimal Node.js container for faster startup
+  build-and-publish:
+    # Run entire workflow in a lightweight Node 20 Alpine container for speed
     runs-on: ubuntu-latest
-    container: node:16-alpine
+    container: node:20-alpine
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-      - run: npm ci
-      - run: npm test
-
-  publish:
-    needs: test
-    # Publish only if tests succeed (implicit when using needs)
-    runs-on: ubuntu-latest
-    container: node:16-alpine
-
-    steps:
+      # Checkout code and preserve token for publishing
       - uses: actions/checkout@v3
         with:
           persist-credentials: true
+
+      # Setup Node.js environment (uses local container's Node 20)
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'
           registry-url: https://registry.npmjs.org/
           always-auth: true
+
+      # Install dependencies
       - run: npm ci
-      - run:
-        npm version patch -m 'chore(release)\: %s'
+
+      # Run tests
+      - run: npm test
+
+      # Bump patch version (creates a git commit and tag)
+      - run: npm version patch
+
+      # Publish to npm
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
