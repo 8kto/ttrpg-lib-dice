@@ -7,33 +7,33 @@ on:
 
 jobs:
   build-and-publish:
-    # Run entire workflow in a lightweight Node 20 Alpine container for speed
+    # Run in lightweight Node 20 Alpine container
     runs-on: ubuntu-latest
     container: node:20-alpine
 
     steps:
-      # Checkout code and preserve token for publishing
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          persist-credentials: true
+          persist-credentials: true  # needed for yarn publish auth
 
-      # Setup Node.js environment (uses local container's Node 20)
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
           registry-url: https://registry.npmjs.org/
           always-auth: true
 
-      # Install dependencies
-      - run: npm ci
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-      # Run tests
-      - run: npm test
+      - name: Run tests
+        run: yarn test
 
-      # Bump patch version (creates a git commit and tag)
-      - run: npm version patch
+      - name: Bump patch version
+        run: yarn version --patch
 
-      # Publish to npm
-      - run: npm publish
+      - name: Publish to npm
+        run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
