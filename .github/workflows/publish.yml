@@ -36,7 +36,7 @@ jobs:
           always-auth: true
       - run: npm ci
       - run:
-        npm version patch -m 'chore(release): %s'
+        npm version patch -m 'chore(release)\: %s'
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
