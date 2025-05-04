@@ -1,5 +1,7 @@
 # ttrpg-lib-dice
 
+[![Tests](https://github.com/8kto/ttrpg-lib-dice/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/8kto/ttrpg-lib-dice/actions/workflows/test.yml)
+
 A small library for rolling dice in tabletop games.
 
 ## Installation
