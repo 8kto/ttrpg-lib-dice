@@ -20,8 +20,13 @@
     "rpg",
     "ttrpg"
   ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "prebuild": "rm -rf dist/",
     "build": "tsc",
