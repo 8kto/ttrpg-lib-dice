@@ -1,6 +1,6 @@
 {
   "name": "ttrpg-lib-dice",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A small library for rolling dice in tabletop games",
   "repository": {
     "type": "git",
