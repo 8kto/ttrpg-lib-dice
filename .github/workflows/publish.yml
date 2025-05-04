@@ -1,7 +1,7 @@
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    # no container: … block here
+    container: node:20-alpine
 
     steps:
       - uses: actions/checkout@v3
@@ -18,6 +18,9 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn test
       - run: yarn version --patch
+
+      - name: Install Git
+        run: apk add --no-cache git openssh-client
 
       - name: Push version bump & tags
         run: |
