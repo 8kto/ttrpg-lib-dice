@@ -4,7 +4,6 @@
     "module": "ES2020",
     "declaration": true,
     "stripInternal": true,
-    "outDir": "dist",
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
