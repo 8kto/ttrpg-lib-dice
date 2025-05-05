@@ -8,6 +8,7 @@ src/
 *.test.ts
 
 .idea/
-jest.config.js
+jest.config.cjs
 tsconfig.json
+tsconfig.*.json
 .*
