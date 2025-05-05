@@ -1,6 +1,6 @@
 {
   "name": "ttrpg-lib-dice",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A small library for rolling dice in tabletop games",
   "author": "8kto (https://ivlev.blog)",
   "repository": {
@@ -27,7 +27,7 @@
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js",
-      "import":  "./dist/esm/index.js"
+      "import": "./dist/esm/index.js"
     }
   },
   "scripts": {
