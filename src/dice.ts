@@ -160,3 +160,19 @@ export const rollDiceFormulaDetailed = (formula: string): DiceRollResultsList =>
 
   return res as object as DiceRollResultsList
 }
+
+/**
+ * O(n) Fisher–Yates shuffle (crypto‐secure)
+ */
+export const shuffleArray = <T>(arr: readonly T[]): T[] => {
+  // clone so we don’t mutate the original
+  const result = arr.slice()
+
+  for (let i = result.length - 1; i > 0; i--) {
+    // pick an index in [0..i]
+    const j = secureRandomInteger(0, i)
+    // swap
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}

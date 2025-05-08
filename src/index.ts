@@ -5,6 +5,7 @@ export {
   getRandomArrayItem,
   getRandomArrayItems,
   secureRandomInteger,
+  shuffleArray,
 } from './dice'
 
 export { Dice } from './domain/Dice'
