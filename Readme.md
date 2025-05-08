@@ -21,7 +21,8 @@ import {
   rollDiceFormula,
   secureRandomInteger,
   getRandomArrayItem,
-  getRandomArrayItems
+  getRandomArrayItems,
+  shuffleArray,
 } from 'dice-roller'
 
 // Roll a single D20
