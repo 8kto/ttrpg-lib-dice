@@ -7,9 +7,9 @@ A small library for rolling dice in tabletop games.
 ## Installation
 
 ```bash
-npm install dice-roller
+npm install ttrpg-lib-dice
 # or
-yarn add dice-roller
+yarn add ttrpg-lib-dice
 ```
 
 ## Usage
