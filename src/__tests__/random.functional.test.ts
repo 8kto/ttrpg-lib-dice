@@ -1,6 +1,6 @@
-import { getRandomArrayItem, getRandomArrayItems, secureRandomInteger } from '../dice'
+import { getRandomArrayItem, getRandomArrayItems, secureRandomInteger } from '../random'
 
-describe('dice utils, functional tests', () => {
+describe('random utils, functional tests', () => {
   describe('secureRandomInteger', () => {
     it.each([
       [1, 10],
