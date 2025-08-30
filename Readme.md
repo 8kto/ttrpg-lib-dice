@@ -19,6 +19,7 @@ import {
   Dice,
   roll,
   rollDiceFormula,
+  rollDiceFormulaDetailed,
   secureRandomInteger,
   getRandomArrayItem,
   getRandomArrayItems,
@@ -28,10 +29,24 @@ import {
 // Roll a single D20
 const single = roll(Dice.d20)
 
-// Roll using a formula: 2d6 + 3
-const formula = rollDiceFormula('2d6+3')
+// Roll using a formula (returns a number)
+const total = rollDiceFormula('2d6+3') // e.g., 12
 
-// Secure random integer between 1 and 100
+// Roll using a formula (detailed breakdown with each roll's values)
+const detailed = rollDiceFormulaDetailed('2d6+3')
+/*
+Example output:
+{
+  formula: '2d6+3',
+  total: 12,
+  rolls: [
+    { formula: '2d6', rolls: [5, 4], total: 9 },
+    { formula: '+3',  rolls: [3],    total: 3 }
+  ]
+}
+*/
+
+// Get a secure random integer between 1 and 100
 const randInt = secureRandomInteger(1, 100)
 
 // Pick one random element
