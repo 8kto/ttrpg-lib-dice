@@ -39,7 +39,7 @@ export const roll = (dice = Dice.d100): number => secureRandomInteger(1, dice)
 
 const isInteger = (str: string): boolean => /^[+-]?\d+$/.test(str.trim())
 
-const getTokens = (formula: string): string[] => formula.match(TOKEN_RE)?.map((t) => t.replace(/\s+/g, '')) ?? []
+export const getTokens = (formula: string): string[] => formula.match(TOKEN_RE)?.map((t) => t.replace(/\s+/g, '')) ?? []
 
 export const isValidDiceFormula = (formula: string): boolean => FORMULA_RE.test(formula.trim())
 

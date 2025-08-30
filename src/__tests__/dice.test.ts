@@ -1,4 +1,4 @@
-import { DiceRollResults, isValidDiceFormula, rollDiceFormula, rollDiceFormulaDetailed } from '../dice'
+import { DiceRollResults, getTokens, isValidDiceFormula, rollDiceFormula, rollDiceFormulaDetailed } from '../dice'
 import * as diceModule from '../dice'
 
 describe('dice utils', () => {
@@ -350,6 +350,68 @@ describe('dice utils', () => {
           expect(isValidDiceFormula(s)).toBe(true)
         },
       )
+    })
+  })
+
+
+  describe('getTokens', () => {
+    describe('valid formulas → expected tokens', () => {
+      test.each<[string, string[]]>([
+        // single integers
+        ['1', ['1']],
+        ['0', ['0']],
+        ['42', ['42']],
+        ['  42  ', ['42']], // trims outer whitespace via regex match window + replace
+
+        // single dice terms (lowercase "d")
+        ['d6', ['d6']],      // implicit 1 count
+        ['3d6', ['3d6']],
+        ['10d20', ['10d20']],
+        ['  d12  ', ['d12']],
+
+        // mixtures with +/-, arbitrary inner spaces around operators (but not inside tokens)
+        ['3d6+2-1', ['3d6', '+2', '-1']],
+        ['3d6 + 2 - 1', ['3d6', '+2', '-1']],
+        ['3d6   +   2   -   1', ['3d6', '+2', '-1']],
+        ['2d8+d6+10', ['2d8', '+d6', '+10']],
+        ['4d10-3d6+7', ['4d10', '-3d6', '+7']],
+        ['10 + d20', ['10', '+d20']],
+        ['d12 - 10 + d6', ['d12', '-10', '+d6']],
+        ['100 + 200 - 300', ['100', '+200', '-300']],
+
+        // tabs/newlines as whitespace between tokens
+        ['3d6\t+\t2\t-\t1', ['3d6', '+2', '-1']],
+        ['3d6 +\n 2 -\n 1', ['3d6', '+2', '-1']],
+
+        // a few more
+        ['d6 + d6', ['d6', '+d6']],
+        ['3d8 - 2', ['3d8', '-2']],
+      ])('tokenizes %s', (input, expected) => {
+        expect(getTokens(input)).toEqual(expected)
+      })
+    })
+
+    describe('invalid formulas', () => {
+      test.each<[string, string[]]>([
+        // embedded spaces inside a single dice token cause splits
+        ['3 d 6', ['3', '6']],
+        ['3d 6', ['3', '6']],
+        ['3 d6', ['3', 'd6']],
+
+        // uppercase D not supported by policy (tokenizer treats as ints)
+        ['3D6', ['3', '6']],
+
+        // dangling operator segments (tokenizer may drop lonely operator)
+        ['3d6+', ['3d6']],            // trailing '+' not part of a token
+        ['3d6 - ', ['3d6']],          // trailing '- ' not part of a token
+
+        // double sign after operator — tokenizer typically keeps last sign
+        ['3d6+-1', ['3d6', '-1']],
+        ['3d6--1', ['3d6', '-1']],
+        ['1+-2', ['1', '-2']],
+      ])('documents tokenization for invalid input %s', (input, expected) => {
+        expect(getTokens(input)).toEqual(expected)
+      })
     })
   })
 })
