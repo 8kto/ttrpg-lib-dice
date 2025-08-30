@@ -353,7 +353,6 @@ describe('dice utils', () => {
     })
   })
 
-
   describe('getTokens', () => {
     describe('valid formulas → expected tokens', () => {
       test.each<[string, string[]]>([
@@ -364,7 +363,7 @@ describe('dice utils', () => {
         ['  42  ', ['42']], // trims outer whitespace via regex match window + replace
 
         // single dice terms (lowercase "d")
-        ['d6', ['d6']],      // implicit 1 count
+        ['d6', ['d6']], // implicit 1 count
         ['3d6', ['3d6']],
         ['10d20', ['10d20']],
         ['  d12  ', ['d12']],
@@ -402,8 +401,8 @@ describe('dice utils', () => {
         ['3D6', ['3', '6']],
 
         // dangling operator segments (tokenizer may drop lonely operator)
-        ['3d6+', ['3d6']],            // trailing '+' not part of a token
-        ['3d6 - ', ['3d6']],          // trailing '- ' not part of a token
+        ['3d6+', ['3d6']], // trailing '+' not part of a token
+        ['3d6 - ', ['3d6']], // trailing '- ' not part of a token
 
         // double sign after operator — tokenizer typically keeps last sign
         ['3d6+-1', ['3d6', '-1']],
