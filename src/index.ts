@@ -1,11 +1,5 @@
-export {
-  roll,
-  rollDiceFormula,
-  isValidDiceFormula,
-  getRandomArrayItem,
-  getRandomArrayItems,
-  secureRandomInteger,
-  shuffleArray,
-} from './dice'
+export { roll, rollDiceFormula, isValidDiceFormula } from './dice'
+
+export { getRandomArrayItem, getRandomArrayItems, shuffleArray, secureRandomInteger } from './random'
 
 export { Dice } from './domain/Dice'

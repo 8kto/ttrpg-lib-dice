@@ -1,178 +1,124 @@
 import { Dice } from './domain/Dice'
+import { secureRandomInteger } from './random'
 
-type DiceOperationFn = (a: number, b: number) => number
-
-type Operator = '+' | '-'
-
-const Operations: Record<Operator, DiceOperationFn> = {
-  '+': (a: number, b: number): number => a + b,
-  '-': (a: number, b: number): number => a - b,
+export type DiceRoll = {
+  /** The original token, e.g. "3d6", "+2", "-d8" */
+  formula: string
+  /** Sum contributed by this token (includes sign if any) */
+  total: number
+  /** Per-roll results; for dice, values are signed to reflect contribution */
+  rolls: number[]
 }
 
-const operationRegExp = /([-+])/
-
-/**
- * Generates a cryptographically secure random integer between min (inclusive) and max (inclusive)
- */
-export const secureRandomInteger = (min: number, max: number): number => {
-  const range = max - min + 1
-  const maxUint32 = 0xffffffff
-  const limit = maxUint32 - (maxUint32 % range)
-  let randomValue
-
-  do {
-    randomValue = crypto.getRandomValues(new Uint32Array(1))[0]
-  } while (randomValue >= limit)
-
-  return min + (randomValue % range)
+export type DiceRollResults = {
+  /** The original input string (unmodified) */
+  formula: string
+  /** Grand total */
+  total: number
+  /** Breakdown per token in left-to-right order */
+  rolls: DiceRoll[]
 }
 
-export const getRandomArrayItem = <T = unknown>(arr: Array<T>): T => {
-  if (!arr.length) {
-    throw new Error('Empty array')
-  }
+const MAX_DICE = 10_000
+const MAX_SIDES = 1_000
 
-  return arr[secureRandomInteger(0, arr.length - 1)]
-}
+/** ------- Patterns  ------- */
 
-export const getRandomArrayItems = <T = unknown>(arr: Array<T>, count: number): Array<T> => {
-  if (count > arr.length) {
-    throw new Error('Requested more elements than are present in the array')
-  }
-  if (!count) {
-    throw new Error('Count should be more than 0')
-  }
+// One dice token: optional sign, optional count>=1, 'd', sides>=1 (lowercase d only)
+const DICE_TOKEN_RE = /^\s*([+-])?([1-9]\d*)?d([1-9]\d*)\s*$/
 
-  const result: Array<T> = []
-  const usedIndices = new Set<number>()
+// Tokenizer: consume optional sign, then either integer or dice (no inner spaces)
+const TOKEN_RE = /[+-]?\s*(?:(?:[1-9]\d*)?d[1-9]\d*|\d+)/g
 
-  while (result.length < count) {
-    const index = secureRandomInteger(0, arr.length - 1)
-    if (!usedIndices.has(index)) {
-      usedIndices.add(index)
-      result.push(arr[index])
-    }
-  }
+// Full-formula validator: term ((+|-) term)* with outer-space tolerance
+const FORMULA_RE = /^((?:[1-9]\d*)?d[1-9]\d*|\d+)(\s*[-+]\s*((?:[1-9]\d*)?d[1-9]\d*|\d+))*\s*$/
 
-  return result
-}
+/** ------- Helpers ------- */
 
 export const roll = (dice = Dice.d100): number => secureRandomInteger(1, dice)
 
-const isDiceRoll = (formula: string): boolean => /^\d*d\d+$/.test(formula.trim())
+const isInteger = (str: string): boolean => /^[+-]?\d+$/.test(str.trim())
 
-const isInteger = (formula: string): boolean => /^\d+$/.test(formula.trim())
+export const getTokens = (formula: string): string[] => formula.match(TOKEN_RE)?.map((t) => t.replace(/\s+/g, '')) ?? []
 
-const rollNumberOfDice = (formula: string): number => {
-  const [numDice, numSides] = formula.split('d').map(Number)
+export const isValidDiceFormula = (formula: string): boolean => FORMULA_RE.test(formula.trim())
 
-  if (isNaN(numDice) || isNaN(numSides)) {
-    throw new Error('Invalid dice formula')
+/** ------- Engine ------- */
+
+export const rollDiceFormulaDetailed = (formula: string): DiceRollResults => {
+  if (!isValidDiceFormula(formula)) {
+    throw new Error('Invalid dice formula, allowed characters are +-, numbers and dices (d6 etc.)')
   }
 
-  let total = 0
-  let i = 0
-  do {
-    total += roll(numSides)
-  } while (++i < numDice)
+  const res: DiceRollResults = { formula, rolls: [], total: 0 }
+  const tokens = getTokens(formula)
 
-  return total
-}
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    const rolls: number[] = []
+    let total = 0
 
-const getTokens = (formula: string): string[] => formula.split(operationRegExp)
+    if (isInteger(token)) {
+      const n = parseInt(token, 10)
+      if (!Number.isSafeInteger(n)) {
+        throw new Error(`Integer out of range: ${token}`)
+      }
+      total = n
+      rolls.push(n)
+    } else {
+      const m = token.match(DICE_TOKEN_RE)
+      if (!m) {
+        throw new Error(`Invalid dice token: ${token} (in ${formula})`)
+      }
 
-const resolveToken = (token: string): number | DiceOperationFn => {
-  if (isDiceRoll(token)) {
-    return rollNumberOfDice(token)
+      const [, signSym, countStr, sidesStr] = m
+      const numDice = countStr ? parseInt(countStr, 10) : 1
+      const numSides = parseInt(sidesStr, 10)
+      const sign = signSym === '-' ? -1 : 1
+
+      if (!Number.isInteger(numDice) || numDice < 1) {
+        throw new Error(`Invalid dice count in token: ${token}`)
+      }
+      if (!Number.isInteger(numSides) || numSides < 1) {
+        throw new Error(`Invalid sides in token: ${token}`)
+      }
+      if (numDice > MAX_DICE) {
+        throw new Error(`Dice count too large (${numDice}): ${token}`)
+      }
+      if (numSides > MAX_SIDES) {
+        throw new Error(`Sides too large (${numSides}): ${token}`)
+      }
+
+      for (let r = 0; r < numDice; r++) {
+        const v = roll(numSides)
+        // We assume roll returns 1..numSides and is a safe integer
+        if (!Number.isSafeInteger(v) || v < 1 || v > numSides) {
+          throw new Error(`Roll produced invalid value ${v} for d${numSides}`)
+        }
+
+        const contrib = sign * v
+        rolls.push(contrib)
+        total += contrib
+      }
+    }
+
+    if (!Number.isSafeInteger(total)) {
+      console.error({ tokens, token, total })
+      throw new Error('Logic error: non-integer subtotal')
+    }
+
+    const record: DiceRoll = { formula: token, total, rolls }
+    res.rolls.push(record)
+    res.total += total
   }
-  if (isInteger(token)) {
-    return parseInt(token, 10)
-  }
-  if (token in Operations) {
-    return Operations[token as Operator]
+
+  if (!Number.isSafeInteger(res.total)) {
+    throw new Error('Logic error: non-integer grand total')
   }
 
-  throw new Error(`Invalid token: ${token}`)
-}
-
-export const isValidDiceFormula = (formula: string): boolean => {
-  const diceRollPattern = /^(\d*d\d+|\d+)((\s*[-+]\s*(\d*d\d+|\d+))\s*)*$/
-
-  return diceRollPattern.test(formula.trim())
+  return res
 }
 
 export const rollDiceFormula = (formula: string): number => {
-  if (!isValidDiceFormula(formula)) {
-    throw new Error(`Invalid dice formula, allowed characters are +-, numbers and dices (d6 etc.): ${formula}`)
-  }
-
-  const tokens = getTokens(formula).map(resolveToken)
-
-  let total = tokens[0] as number
-
-  for (let i = 1; i < tokens.length; i += 2) {
-    const operation = tokens[i] as DiceOperationFn
-    const value = tokens[i + 1] as number
-
-    if (!Number.isInteger(value) || !Number.isInteger(total) || typeof operation !== 'function') {
-      console.error({ operation, tokens, total, value })
-      throw new Error('Logic error, cannot parse tokens')
-    }
-
-    total = operation(total, value)
-  }
-
-  return total
-}
-
-type DiceRollResult = [string, number, number[]]
-type DiceRollResultsList = DiceRollResult[]
-
-/**
- * TODO fix issues, publish
- */
-export const rollDiceFormulaDetailed = (formula: string): DiceRollResultsList => {
-  if (!isValidDiceFormula(formula)) {
-    // throw new Error('Invalid dice formula, allowed characters are +-, numbers and dices (d6 etc.)')
-  }
-
-  const subFormulas = formula.split(',')
-  const res = subFormulas.map((subFormula) => {
-    const tokens = getTokens(subFormula).map(resolveToken) // FIXME
-
-    const res: DiceRollResult = [subFormula, tokens[0] as number, [tokens[0] as number]]
-
-    for (let i = 1; i < tokens.length; i += 2) {
-      const operation = tokens[i] as DiceOperationFn
-      const value = tokens[i + 1] as number
-
-      if (!Number.isInteger(value) || !Number.isInteger(res) || typeof operation !== 'function') {
-        console.error({ operation, tokens, total: res, value })
-        throw new Error('Logic error, cannot parse tokens')
-      }
-
-      res[1] = operation(res[1], value)
-      res[2].push(value)
-    }
-
-    return res
-  })
-
-  return res as object as DiceRollResultsList
-}
-
-/**
- * O(n) Fisher–Yates shuffle (crypto‐secure)
- */
-export const shuffleArray = <T>(arr: readonly T[]): T[] => {
-  // clone so we don’t mutate the original
-  const result = arr.slice()
-
-  for (let i = result.length - 1; i > 0; i--) {
-    // pick an index in [0..i]
-    const j = secureRandomInteger(0, i)
-    // swap
-    ;[result[i], result[j]] = [result[j], result[i]]
-  }
-  return result
+  return rollDiceFormulaDetailed(formula).total
 }
