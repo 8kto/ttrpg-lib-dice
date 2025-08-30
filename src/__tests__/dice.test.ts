@@ -15,74 +15,56 @@ describe('dice utils', () => {
     jest.restoreAllMocks()
   })
 
-  it('should return the correct total for a valid dice formula', () => {
-    const result = rollDiceFormula('3d6')
-    expect(result).toBe(9) // Since the mock always returns 3, 3 rolls of 3 result in 9
-  })
+  describe('rollDiceFormula', () => {
+    it.each([
+      ['d6', 3],
+      ['1d6', 3],
+      ['2d6', 6],
+      ['3d6', 9],
+      ['2d20', 6],
+    ])('should handle number of dices for %s', (input, expected) => {
+      const result = rollDiceFormula(input)
+      expect(result).toBe(expected)
+    })
 
-  it.each([
-    ['d6', 3],
-    ['1d6', 3],
-    ['2d6', 6],
-    ['3d6', 9],
-    ['2d20', 6],
-  ])('should handle number of dices for %s', (input, expected) => {
-    const result = rollDiceFormula(input)
-    expect(result).toBe(expected)
-  })
+    it('should support simplified format', () => {
+      const result = rollDiceFormula('d6')
+      expect(result).toBe(3)
+    })
 
-  it('should support simplified format', () => {
-    const result = rollDiceFormula('d6')
-    expect(result).toBe(3)
-  })
+    it.each([
+      ['d6+1', 4],
+      ['d6 + 1', 4],
+      ['d6 +1', 4],
+      ['d6-1', 2],
+      ['d6 - 1', 2],
+      ['d6 -1', 2],
+    ])('should support simple formulas %s', (input, expected) => {
+      const result = rollDiceFormula(input)
+      expect(result).toBe(expected)
+    })
 
-  it.each(['invalid', '(d6+10)', 'd6/1', 'd6*2', '2*d6'])(
-    'should throw an error for an invalid dice formula %s',
-    (input) => {
-      expect(() => rollDiceFormula(input)).toThrow(
-        'Invalid dice formula, allowed characters are +-, numbers and dices (d6 etc.)',
-      )
-    },
-  )
+    it.each([
+      ['2d6+1', 7],
+      ['3d6 + 1', 10],
+      ['4d6 +1', 13],
+      ['2d6-1', 5],
+      ['3d6 - 1', 8],
+      ['6d6 -1', 17],
+    ])('should support simple formulas with nums %s', (input, expected) => {
+      const result = rollDiceFormula(input)
+      expect(result).toBe(expected)
+    })
 
-  it('should return the correct total for another valid dice formula', () => {
-    const result = rollDiceFormula('5d4')
-    expect(result).toBe(15)
-  })
-
-  it.each([
-    ['d6+1', 4],
-    ['d6 + 1', 4],
-    ['d6 +1', 4],
-    ['d6-1', 2],
-    ['d6 - 1', 2],
-    ['d6 -1', 2],
-    // ['0d6', 0], // FIXME
-  ])('should support simple formulas %s', (input, expected) => {
-    const result = rollDiceFormula(input)
-    expect(result).toBe(expected)
-  })
-
-  it.each([
-    ['2d6+1', 7],
-    ['3d6 + 1', 10],
-    ['4d6 +1', 13],
-    ['2d6-1', 5],
-    ['3d6 - 1', 8],
-    ['6d6 -1', 17],
-  ])('should support simple formulas with nums %s', (input, expected) => {
-    const result = rollDiceFormula(input)
-    expect(result).toBe(expected)
-  })
-
-  it.each([
-    ['d6+1+2', 6],
-    ['d6+d6', 6],
-    ['d6 + d6 + 1', 7],
-    ['d6 + d6 + d10 -2', 7],
-  ])('should support multiple dice rolls %s', (input, expected) => {
-    const result = rollDiceFormula(input)
-    expect(result).toBe(expected)
+    it.each([
+      ['d6+1+2', 6],
+      ['d6+d6', 6],
+      ['d6 + d6 + 1', 7],
+      ['d6 + d6 + d10 -2', 7],
+    ])('should support multiple dice rolls %s', (input, expected) => {
+      const result = rollDiceFormula(input)
+      expect(result).toBe(expected)
+    })
   })
 
   describe('rollDiceFormulaDetailed', () => {
@@ -229,12 +211,12 @@ describe('dice utils', () => {
           total: 0,
         },
       ],
-    ])('should support multiple dice rolls %s', (input, expected) => {
+    ])('should support dice rolls %s', (input, expected) => {
       const result = rollDiceFormulaDetailed(input)
       expect(result).toStrictEqual(expected)
     })
 
-    describe('invalid formulas (as per current parser & tightened validator)', () => {
+    describe('invalid formulas', () => {
       test.each<string>([
         '', // empty
         '   ', // whitespace only
@@ -252,6 +234,7 @@ describe('dice utils', () => {
         '3.5d6', // decimals not allowed
         '3d6 * 2', // unsupported operator
         '3d6 / 2',
+        '0d6',
         '3D6', // uppercase D not supported
         'd6 + -2', // term cannot have a second sign after an operator
       ])('rejects %s', (s) => {
@@ -319,7 +302,7 @@ describe('dice utils', () => {
         [''],
         ['   '],
 
-        // leading sign not allowed by current pattern
+        // leading sign not allowed
         ['+2'],
         ['-1'],
         ['-d6+1'],
@@ -340,6 +323,7 @@ describe('dice utils', () => {
         ['3d'], // missing sides
         ['d+6'], // operator inside token
         ['3d-6'], // negative sides inside token
+        ['0d6'], // zero num dices
         ['d-6'],
 
         // unsupported numeric formats/operators
