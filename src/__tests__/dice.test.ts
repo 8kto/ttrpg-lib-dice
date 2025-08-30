@@ -259,10 +259,16 @@ describe('dice utils', () => {
         expect(() => rollDiceFormulaDetailed(s)).toThrow()
       })
 
-      test('exceeds MAX_DICE', () => {
+      it('exceeds MAX_DICE', () => {
         const s = '10001d6' // exceeds 10_000
         expect(isValidDiceFormula(s)).toBe(true) // syntactically fine
         expect(() => rollDiceFormulaDetailed(s)).toThrow(/Dice count too large/i)
+      })
+
+      it('exceeds MAX_SIDES', () => {
+        const s = '3d1100'
+        expect(isValidDiceFormula(s)).toBe(true) // syntactically fine
+        expect(() => rollDiceFormulaDetailed(s)).toThrow('Sides too large (1100): 3d1100')
       })
     })
 
